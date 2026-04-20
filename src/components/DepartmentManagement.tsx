@@ -7,6 +7,8 @@ import { ViewAssignments } from './ViewAssignments';
 import { UpdateWorkOrder } from './UpdateWorkOrder';
 import { IssueAssignmentCreate } from './IssueAssignmentCreate';
 import IssueAssignmentRead from './IssueAssignmentRead';
+import { IssueAssignmentUpdate } from './IssueAssignmentUpdate';
+import { IssueAssignmentDelete } from './IssueAssignmentDelete';
 import '../styles/DepartmentManagement.css';
 
 export const DepartmentManagement: React.FC = () => {
@@ -87,7 +89,7 @@ export const DepartmentManagement: React.FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedIssue, setSelectedIssue] = useState<ReportIssue | null>(null);
   const [generatedWorkOrder, setGeneratedWorkOrder] = useState<WorkOrder | null>(null);
-  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update' | 'assign-issue-2a' | 'view-assignments-2b'>('manage');
+  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update' | 'assign-issue-2a' | 'view-assignments-2b' | 'update-assignment-2c' | 'delete-assignment-2d'>('manage');
 
   const handleAssignIssue = (
     departmentId: string,
@@ -179,6 +181,18 @@ export const DepartmentManagement: React.FC = () => {
             onClick={() => setActiveView('view-assignments-2b')}
           >
             View Assignments 2B
+          </button>
+          <button
+            className={`nav-tab ${activeView === 'update-assignment-2c' ? 'active' : ''}`}
+            onClick={() => setActiveView('update-assignment-2c')}
+          >
+            Update Assignments
+          </button>
+          <button
+            className={`nav-tab ${activeView === 'delete-assignment-2d' ? 'active' : ''}`}
+            onClick={() => setActiveView('delete-assignment-2d')}
+          >
+            Cancel Work Orders
           </button>
         </div>
       </div>
@@ -368,6 +382,35 @@ export const DepartmentManagement: React.FC = () => {
           departments={departments}
           teamMembers={teamMembers}
           reportIssues={reportIssues}
+        />
+      )}
+
+      {activeView === 'update-assignment-2c' && (
+        <IssueAssignmentUpdate
+          workOrders={workOrders}
+          departments={departments}
+          teamMembers={teamMembers}
+          reportIssues={reportIssues}
+          onUpdate={(updatedWorkOrder) => {
+            setWorkOrders(
+              workOrders.map((wo) =>
+                wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo
+              )
+            );
+          }}
+        />
+      )}
+
+      {activeView === 'delete-assignment-2d' && (
+        <IssueAssignmentDelete
+          workOrders={workOrders}
+          reportIssues={reportIssues}
+          departments={departments}
+          onDelete={(workOrderId) => {
+            setWorkOrders(
+              workOrders.filter((wo) => wo.id !== workOrderId)
+            );
+          }}
         />
       )}
     </div>
