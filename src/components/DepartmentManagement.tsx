@@ -3,6 +3,7 @@ import type { ReportIssue, Department, TeamMember, WorkOrder } from '../types';
 import { AssignIssueForm } from './AssignIssueForm';
 import { WorkOrderDisplay } from './WorkOrderDisplay';
 import { ManageDepartments } from './ManageDepartments';
+import { ViewAssignments } from './ViewAssignments';
 import '../styles/DepartmentManagement.css';
 
 export const DepartmentManagement: React.FC = () => {
@@ -83,7 +84,7 @@ export const DepartmentManagement: React.FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedIssue, setSelectedIssue] = useState<ReportIssue | null>(null);
   const [generatedWorkOrder, setGeneratedWorkOrder] = useState<WorkOrder | null>(null);
-  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders'>('manage');
+  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments'>('manage');
 
   const handleAssignIssue = (
     departmentId: string,
@@ -151,6 +152,12 @@ export const DepartmentManagement: React.FC = () => {
             onClick={() => setActiveView('orders')}
           >
             Work Orders ({workOrders.length})
+          </button>
+          <button
+            className={`nav-tab ${activeView === 'assignments' ? 'active' : ''}`}
+            onClick={() => setActiveView('assignments')}
+          >
+            View Assignments
           </button>
         </div>
       </div>
@@ -288,6 +295,15 @@ export const DepartmentManagement: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      {activeView === 'assignments' && (
+        <ViewAssignments
+          workOrders={workOrders}
+          reportIssues={reportIssues}
+          departments={departments}
+          teamMembers={teamMembers}
+        />
       )}
     </div>
   );
