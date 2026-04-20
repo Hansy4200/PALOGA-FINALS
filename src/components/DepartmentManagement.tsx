@@ -5,6 +5,7 @@ import { WorkOrderDisplay } from './WorkOrderDisplay';
 import { ManageDepartments } from './ManageDepartments';
 import { ViewAssignments } from './ViewAssignments';
 import { UpdateWorkOrder } from './UpdateWorkOrder';
+import { IssueAssignmentCreate } from './IssueAssignmentCreate';
 import '../styles/DepartmentManagement.css';
 
 export const DepartmentManagement: React.FC = () => {
@@ -85,7 +86,7 @@ export const DepartmentManagement: React.FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedIssue, setSelectedIssue] = useState<ReportIssue | null>(null);
   const [generatedWorkOrder, setGeneratedWorkOrder] = useState<WorkOrder | null>(null);
-  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update'>('manage');
+  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update' | 'assign-issue-2a'>('manage');
 
   const handleAssignIssue = (
     departmentId: string,
@@ -165,6 +166,12 @@ export const DepartmentManagement: React.FC = () => {
             onClick={() => setActiveView('update')}
           >
             Update Progress
+          </button>
+          <button
+            className={`nav-tab ${activeView === 'assign-issue-2a' ? 'active' : ''}`}
+            onClick={() => setActiveView('assign-issue-2a')}
+          >
+            Create Work Orders
           </button>
         </div>
       </div>
@@ -323,6 +330,25 @@ export const DepartmentManagement: React.FC = () => {
             setWorkOrders(
               workOrders.map((wo) =>
                 wo.id === updatedOrder.id ? updatedOrder : wo
+              )
+            );
+          }}
+        />
+      )}
+
+      {activeView === 'assign-issue-2a' && (
+        <IssueAssignmentCreate
+          reportIssues={reportIssues}
+          departments={departments}
+          teamMembers={teamMembers}
+          onWorkOrderCreate={(newWorkOrder) => {
+            setWorkOrders([...workOrders, newWorkOrder]);
+            // Update the issue status to assigned
+            setReportIssues(
+              reportIssues.map((issue) =>
+                issue.id === newWorkOrder.issueId
+                  ? { ...issue, status: 'assigned' as const }
+                  : issue
               )
             );
           }}
