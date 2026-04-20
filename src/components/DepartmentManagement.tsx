@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { ReportIssue, Department, TeamMember, WorkOrder } from '../types';
+import type { AdminUser, UserRole } from '../types/admin';
 import { AssignIssueForm } from './AssignIssueForm';
 import { WorkOrderDisplay } from './WorkOrderDisplay';
 import { ManageDepartments } from './ManageDepartments';
@@ -9,6 +10,7 @@ import { IssueAssignmentCreate } from './IssueAssignmentCreate';
 import IssueAssignmentRead from './IssueAssignmentRead';
 import { IssueAssignmentUpdate } from './IssueAssignmentUpdate';
 import { IssueAssignmentDelete } from './IssueAssignmentDelete';
+import { AdminUserRoleManagement } from './AdminUserRoleManagement';
 import '../styles/DepartmentManagement.css';
 
 export const DepartmentManagement: React.FC = () => {
@@ -89,7 +91,50 @@ export const DepartmentManagement: React.FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedIssue, setSelectedIssue] = useState<ReportIssue | null>(null);
   const [generatedWorkOrder, setGeneratedWorkOrder] = useState<WorkOrder | null>(null);
-  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update' | 'assign-issue-2a' | 'view-assignments-2b' | 'update-assignment-2c' | 'delete-assignment-2d'>('manage');
+  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update' | 'assign-issue-2a' | 'view-assignments-2b' | 'update-assignment-2c' | 'delete-assignment-2d' | 'admin-user-roles-3a'>('manage');
+
+  // Admin users and roles state
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([
+    {
+      id: 'admin-user-001',
+      name: 'Administrator',
+      email: 'admin@agency.gov',
+      phone: '+1 (555) 999-0000',
+      departmentId: 'dept-001',
+      roleId: 'role-admin',
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastLogin: new Date(),
+    },
+  ]);
+
+  const [userRoles, setUserRoles] = useState<UserRole[]>([
+    {
+      id: 'role-admin',
+      name: 'Administrator',
+      description: 'Full system access with all permissions',
+      permissions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 'role-manager',
+      name: 'Department Manager',
+      description: 'Manage assignments and staff within their department',
+      permissions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 'role-staff',
+      name: 'Staff Member',
+      description: 'View and update assigned work orders',
+      permissions: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ]);
 
   const handleAssignIssue = (
     departmentId: string,
@@ -193,6 +238,12 @@ export const DepartmentManagement: React.FC = () => {
             onClick={() => setActiveView('delete-assignment-2d')}
           >
             Cancel Work Orders
+          </button>
+          <button
+            className={`nav-tab ${activeView === 'admin-user-roles-3a' ? 'active' : ''}`}
+            onClick={() => setActiveView('admin-user-roles-3a')}
+          >
+            👤 Admin Dashboard
           </button>
         </div>
       </div>
@@ -410,6 +461,27 @@ export const DepartmentManagement: React.FC = () => {
             setWorkOrders(
               workOrders.filter((wo) => wo.id !== workOrderId)
             );
+          }}
+        />
+      )}
+
+      {activeView === 'admin-user-roles-3a' && (
+        <AdminUserRoleManagement
+          users={adminUsers}
+          roles={userRoles}
+          departments={departments}
+          onUserUpdate={(updatedUser) => {
+            setAdminUsers(
+              adminUsers.map((u) =>
+                u.id === updatedUser.id ? updatedUser : u
+              )
+            );
+          }}
+          onUserCreate={(newUser) => {
+            setAdminUsers([...adminUsers, newUser]);
+          }}
+          onRoleCreate={(newRole) => {
+            setUserRoles([...userRoles, newRole]);
           }}
         />
       )}
