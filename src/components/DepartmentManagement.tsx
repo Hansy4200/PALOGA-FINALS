@@ -4,6 +4,7 @@ import { AssignIssueForm } from './AssignIssueForm';
 import { WorkOrderDisplay } from './WorkOrderDisplay';
 import { ManageDepartments } from './ManageDepartments';
 import { ViewAssignments } from './ViewAssignments';
+import { UpdateWorkOrder } from './UpdateWorkOrder';
 import '../styles/DepartmentManagement.css';
 
 export const DepartmentManagement: React.FC = () => {
@@ -84,7 +85,7 @@ export const DepartmentManagement: React.FC = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedIssue, setSelectedIssue] = useState<ReportIssue | null>(null);
   const [generatedWorkOrder, setGeneratedWorkOrder] = useState<WorkOrder | null>(null);
-  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments'>('manage');
+  const [activeView, setActiveView] = useState<'manage' | 'issues' | 'orders' | 'assignments' | 'update'>('manage');
 
   const handleAssignIssue = (
     departmentId: string,
@@ -158,6 +159,12 @@ export const DepartmentManagement: React.FC = () => {
             onClick={() => setActiveView('assignments')}
           >
             View Assignments
+          </button>
+          <button
+            className={`nav-tab ${activeView === 'update' ? 'active' : ''}`}
+            onClick={() => setActiveView('update')}
+          >
+            Update Progress
           </button>
         </div>
       </div>
@@ -303,6 +310,22 @@ export const DepartmentManagement: React.FC = () => {
           reportIssues={reportIssues}
           departments={departments}
           teamMembers={teamMembers}
+        />
+      )}
+
+      {activeView === 'update' && (
+        <UpdateWorkOrder
+          workOrders={workOrders}
+          reportIssues={reportIssues}
+          departments={departments}
+          teamMembers={teamMembers}
+          onWorkOrderUpdate={(updatedOrder) => {
+            setWorkOrders(
+              workOrders.map((wo) =>
+                wo.id === updatedOrder.id ? updatedOrder : wo
+              )
+            );
+          }}
         />
       )}
     </div>
